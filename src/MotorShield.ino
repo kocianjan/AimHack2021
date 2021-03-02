@@ -22,31 +22,43 @@ void setup() {
 }
 
 void loop() {
-  motorL.run(FORWARD);
-  motorR.run(FORWARD);
+  //forwardAndBack();
+}
+
+void startMotors(int maxSpeed, int startDelay) {
   for (i = 0; i < maxSpeed; i++) {
     motorL.setSpeed(i);
     motorR.setSpeed(i);
-    delay(dt);
+    delay(startDelay);
   }
-  delay(runtime);
+}
+
+void startMotors() {
+  startMotors(maxSpeed, dt);
+}
+
+void stopMotors(int maxSpeed, int startDelay) {
   for (i = maxSpeed; i >= 0; i--) {
     motorL.setSpeed(i);
     motorR.setSpeed(i);
-    delay(dt);
+    delay(startDelay);
   }
+}
+
+void stopMotors() {
+  stopMotors(maxSpeed, dt);
+}
+
+void forwardAndBack() {
+  motorL.run(FORWARD);
+  motorR.run(FORWARD);
+  startMotors();
+  delay(runtime);
+  stopMotors();
   
   motorL.run(BACKWARD);
   motorR.run(BACKWARD);
-  for (i=0; i < maxSpeed; i++) {
-    motorL.setSpeed(i);
-    motorR.setSpeed(i);
-    delay(dt);
-  }
+  startMotors();
   delay(runtime);
-  for (i = maxSpeed; i >= 0; i--) {
-    motorL.setSpeed(i);
-    motorR.setSpeed(i);
-    delay(dt);
-  }
+  stopMotors();
 }
