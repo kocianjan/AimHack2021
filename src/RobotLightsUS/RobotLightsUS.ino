@@ -1,8 +1,15 @@
 
-// knihovny pro LCD přes I2C
-#include <Wire.h>
-//#include <LiquidCrystal_I2C.h>
 #include <Adafruit_NeoPixel.h>
+// Ultrazvukový modul HY-SRF05 pro měření vzdálenosti
+
+// připojení potřebné knihovny
+#include <NewPing.h>
+// nastavení propojovacích pinů
+#define pinTrigger    A1 // yellow
+#define pinEcho       A0 // orange
+#define maxDistance 200
+// inicializace měřícího modulu z knihovny
+NewPing sonar(pinTrigger, pinEcho, maxDistance);
  
 #define LED_FRONT_PIN A2
 #define NR_FRONT_LED 8 // front strip has 8 LEDs
@@ -15,10 +22,6 @@
 Adafruit_NeoPixel stripFront = Adafruit_NeoPixel(NR_FRONT_LED, LED_FRONT_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel stripRear = Adafruit_NeoPixel(NR_REAR_LED, LED_REAR_PIN, NEO_GRB + NEO_KHZ800); 
 
-// LCD displej pres I2C
-// nastavení adresy I2C (0x27 v mém případě),
-// a dále počtu znaků a řádků LCD, zde 16x2
-//LiquidCrystal_I2C lcd(0x27, 16, 2);
 uint32_t RED, GREEN, BLUE, BRIGHT_WHITE, WHITE, BLACK, ORANGE;
 
 #define OFF 0x0000
@@ -136,7 +139,7 @@ static void lightFourColors(Adafruit_NeoPixel &strip, uint32_t c1, uint32_t c2, 
 static void lightThreeColors(Adafruit_NeoPixel &strip, uint32_t c1, uint32_t c2, uint32_t c3) {
   for(uint16_t i = 0; i < strip.numPixels(); i++) { // cyklus i bude mít hodnoty 0,1,2,3,4,5,6,7
     if (i == 2 || i == 5) {
-      continue;
+      strip.setPixelColor(i, 0);
     }
     if (i < 2) {
       strip.setPixelColor(i, c1);
@@ -160,7 +163,21 @@ static uint32_t blinkColor(uint32_t color1, uint32_t color2) {
     return color2;
   }
 }
-  
+
+static void lightMeter(Adafruit_NeoPixel &strip, uint32_t c, int d) {
+  int ledCount = (2 * d * strip.numPixels()) / maxDistance;
+  //Serial.println(ledCount);
+  for(uint16_t i = 0; i < strip.numPixels(); i++) {
+    if (i < ledCount) {
+      strip.setPixelColor(i, c);
+    }
+    else {
+      strip.setPixelColor(i, 0);
+    }
+  }
+  strip.show();
+}
+
 void loop() {
   //chase(stripFront, WHITE);
   //light(stripFront, WHITE); // White front lights on
@@ -186,6 +203,37 @@ void loop() {
   updateLED(BLINK_LEFT);
   delay(1000);
   updateLED(OFF);
-  updateLCD();
+  
   */
+
+  // načtení vzdálenosti v centimetrech do vytvořené proměnné vzdalenost
+  int distance = sonar.ping_cm();
+  // pauza před dalším měřením
+  delay(50);
+  // pokud byla detekována vzdálenost větší než 0,
+  // provedeme další měření
+  if (distance > 0) {
+    distance = 0;
+    // pro získání stabilnějších výsledků provedeme 5 měření
+    // a výsledky budeme přičítat do proměnné vzdalenost
+    for (int i = 0; i < 5; i++) {
+      distance += sonar.ping_cm();
+      delay(5);
+    }
+    // v proměnné vzdálenost máme součet posledních 5 měření
+    // a musíme tedy provést dělení 5 pro získání průměru
+    distance = distance / 5;
+    // vytištění informací po sériové lince
+    Serial.print("Distance: ");
+    Serial.print(distance);
+    Serial.println(" cm");
+    
+  }
+  // pokud byla detekována vzdálenost 0, je předmět mimo měřící rozsah,
+  // tedy příliš blízko nebo naopak daleko
+  else {
+    Serial.println("Out of range.");
+  }
+
+  lightMeter(stripFront, ORANGE, distance);
 }
