@@ -163,6 +163,7 @@ static uint32_t blinkColor(uint32_t color1, uint32_t color2) {
   
 void loop() {
   //chase(stripFront, WHITE);
+  light(stripFront, BLACK); // front lights off
   //light(stripFront, WHITE); // White front lights on
   //light(stripFront, blinkColor(0, WHITE)); // Blinking white front lights
   //lightTwoColors(stripFront, blinkColor(RED, BLACK), blinkColor(BLACK, BLUE)); // Police
