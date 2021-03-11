@@ -8,25 +8,31 @@
 AF_DCMotor motorL(1);
 AF_DCMotor motorR(2);
 
-int i;
-int dt = 3;
-int runtime = 2000;
-int maxSpeed = 127;
+static int START_DELAY = 3;
+static int MAX_SPEED = 127;
+
 
 void setup() {
   // zapnuti prace s DC motorem
-  motorL.setSpeed(maxSpeed);
+  motorL.setSpeed(MAX_SPEED);
   motorL.run(RELEASE);
-  motorR.setSpeed(maxSpeed);
+  motorR.setSpeed(MAX_SPEED);
   motorR.run(RELEASE);
 }
 
 void loop() {
-  //forwardAndBack();
+  //move(FORWARD, RELEASE, 1000); // left only
+  //move(RELEASE, FORWARD, 1000); // right only
+  //circle();
+}
+
+void circle() {
+  forward(100);
+  turnLeft(20);
 }
 
 void startMotors(int maxSpeed, int startDelay) {
-  for (i = 0; i < maxSpeed; i++) {
+  for (int i = 0; i < maxSpeed; i++) {
     motorL.setSpeed(i);
     motorR.setSpeed(i);
     delay(startDelay);
@@ -34,11 +40,11 @@ void startMotors(int maxSpeed, int startDelay) {
 }
 
 void startMotors() {
-  startMotors(maxSpeed, dt);
+  startMotors(MAX_SPEED, START_DELAY);
 }
 
 void stopMotors(int maxSpeed, int startDelay) {
-  for (i = maxSpeed; i >= 0; i--) {
+  for (int i = maxSpeed; i >= 0; i--) {
     motorL.setSpeed(i);
     motorR.setSpeed(i);
     delay(startDelay);
@@ -46,19 +52,29 @@ void stopMotors(int maxSpeed, int startDelay) {
 }
 
 void stopMotors() {
-  stopMotors(maxSpeed, dt);
+  stopMotors(MAX_SPEED, START_DELAY);
 }
 
-void forwardAndBack() {
-  motorL.run(FORWARD);
-  motorR.run(FORWARD);
+void move(int leftMotorDirection, int rightMotorDirection, int moveTime) {
+  motorL.run(leftMotorDirection);
+  motorR.run(rightMotorDirection);
   startMotors();
-  delay(runtime);
+  delay(moveTime);
   stopMotors();
-  
-  motorL.run(BACKWARD);
-  motorR.run(BACKWARD);
-  startMotors();
-  delay(runtime);
-  stopMotors();
+}
+
+void forward(int moveTime) {
+  move(FORWARD, FORWARD, moveTime);
+}
+
+void back(int moveTime) {
+  move(BACKWARD, BACKWARD, moveTime);
+}
+
+void turnRight(int moveTime) {
+  move(FORWARD, BACKWARD, moveTime);
+}
+
+void turnLeft(int moveTime) {
+  move(BACKWARD, FORWARD, moveTime);
 }
