@@ -5,8 +5,8 @@
 #include <Servo.h> 
 
 // pripojeni DC motoru na konektor M1, M2
-AF_DCMotor motorL(1);
-AF_DCMotor motorR(2);
+AF_DCMotor motorL(2);
+AF_DCMotor motorR(1);
 
 static int START_DELAY = 3;
 static int MAX_SPEED = 127;
@@ -24,11 +24,27 @@ void loop() {
   //move(FORWARD, RELEASE, 1000); // left only
   //move(RELEASE, FORWARD, 1000); // right only
   //circle();
+  //forwardAndBack(500);
+  //waltz();
+}
+
+void waltz() {
+  int moveT = 300;
+  int turnT = 500;
+  forward(moveT);
+  turnRight(turnT);
+  back(moveT);
+  turnRight(turnT);
 }
 
 void circle() {
   forward(100);
   turnLeft(20);
+}
+
+void forwardAndBack(int moveTime) {
+  forward(moveTime);
+  back(moveTime);
 }
 
 void startMotors(int maxSpeed, int startDelay) {
