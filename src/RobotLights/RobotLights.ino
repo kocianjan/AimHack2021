@@ -4,7 +4,7 @@
 //#include <LiquidCrystal_I2C.h>
 #include <Adafruit_NeoPixel.h>
  
-#define LED_FRONT_PIN A2
+#define LED_FRONT_PIN 2
 #define NR_FRONT_LED 8 // front strip has 8 LEDs
 #define LED_REAR_PIN A3
 #define NR_REAR_LED 2 // only 2 rear LEDs
@@ -162,7 +162,7 @@ static uint32_t blinkColor(uint32_t color1, uint32_t color2) {
 }
   
 void loop() {
-  //chase(stripFront, WHITE);
+  //chase(stripFront, WHITE); // moving light
   light(stripFront, BLACK); // front lights off
   //light(stripFront, WHITE); // White front lights on
   //light(stripFront, blinkColor(0, WHITE)); // Blinking white front lights
